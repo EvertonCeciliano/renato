@@ -13,6 +13,7 @@ const dbConfig = {
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'restaurant_management',
+  port: process.env.DB_PORT || 3307,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
@@ -156,14 +157,17 @@ app.put('/api/menu-items/:id', async (req, res, next) => {
 
 app.delete('/api/menu-items/:id', async (req, res, next) => {
   const { id } = req.params;
-  
   try {
     const [result] = await pool.query('DELETE FROM menu_items WHERE id = ?', [id]);
     if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Menu item not found' });
+      return res.status(404).json({ error: 'Item do cardápio não encontrado.' });
     }
     res.status(204).send();
   } catch (error) {
+    // Tratamento para erro de integridade referencial (foreign key)
+    if (error.code === 'ER_ROW_IS_REFERENCED_2' || (error.errno === 1451)) {
+      return res.status(409).json({ error: 'Não é possível excluir este item do cardápio porque ele está vinculado a pedidos existentes.' });
+    }
     next(error);
   }
 });

@@ -1,19 +1,17 @@
-import { ReactNode } from 'react';
+import React from 'react';
+import { cn } from '../../utils/cn';
 
-interface SectionHeaderProps {
-  title: string;
-  icon: ReactNode;
-}
+export interface SectionHeaderProps extends React.HTMLAttributes<HTMLHeadingElement> {}
 
-export default function SectionHeader({ title, icon }: SectionHeaderProps) {
-  return (
-    <div className="flex items-center mb-8">
-      <div className="p-3 bg-green-100 rounded-xl mr-4">
-        <div className="h-8 w-8 text-green-600">
-          {icon}
-        </div>
-      </div>
-      <h2 className="text-2xl sm:text-3xl font-bold text-green-800">{title}</h2>
-    </div>
-  );
-} 
+export const SectionHeader = React.forwardRef<HTMLHeadingElement, SectionHeaderProps>(
+  ({ className, children, ...props }, ref) => (
+    <h2
+      ref={ref}
+      className={cn('text-2xl font-semibold text-gray-900 mb-6', className)}
+      {...props}
+    >
+      {children}
+    </h2>
+  )
+);
+SectionHeader.displayName = 'SectionHeader'; 

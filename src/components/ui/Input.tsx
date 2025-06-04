@@ -1,74 +1,26 @@
 import React from 'react';
-import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '../../utils/cn';
 
-const inputVariants = cva(
-  'w-full rounded-lg transition-colors focus:outline-none',
-  {
-    variants: {
-      variant: {
-        default: 'border border-green-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20',
-        error: 'border-rose-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20',
-      },
-      size: {
-        sm: 'text-sm px-3 py-1.5',
-        md: 'px-4 py-2.5',
-        lg: 'text-lg px-4 py-3',
-      },
-    },
-    defaultVariants: {
-      variant: 'default',
-      size: 'md',
-    },
-  }
-);
-
-export interface InputProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'>,
-    VariantProps<typeof inputVariants> {
-  error?: string;
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
+  error?: string;
 }
 
-const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, variant, size, error, label, leftIcon, rightIcon, ...props }, ref) => {
-    return (
-      <div className="space-y-1.5">
-        {label && (
-          <label className="block text-sm font-medium text-green-700">
-            {label}
-          </label>
+export const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, label, error, ...props }, ref) => (
+    <div className="mb-4">
+      {label && <label className="block text-gray-500 text-sm font-medium mb-1">{label}</label>}
+      <input
+        ref={ref}
+        className={cn(
+          'w-full rounded-xl border border-gray-200 px-4 py-2 bg-white text-gray-900 shadow-sm focus:ring-2 focus:ring-[#0071e3] focus:border-[#0071e3] transition-all duration-150',
+          error && 'border-red-400 focus:border-red-500 focus:ring-red-200',
+          className
         )}
-        <div className="relative">
-          {leftIcon && (
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-green-500">
-              {leftIcon}
-            </div>
-          )}
-          <input
-            ref={ref}
-            className={inputVariants({
-              variant: error ? 'error' : variant,
-              size,
-              className: `${leftIcon ? 'pl-10' : ''} ${rightIcon ? 'pr-10' : ''} ${className || ''}`,
-            })}
-            {...props}
-          />
-          {rightIcon && (
-            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-green-500">
-              {rightIcon}
-            </div>
-          )}
-        </div>
-        {error && (
-          <p className="text-sm text-rose-600">{error}</p>
-        )}
-      </div>
-    );
-  }
+        {...props}
+      />
+      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+    </div>
+  )
 );
-
-Input.displayName = 'Input';
-
-export { Input, inputVariants }; 
+Input.displayName = 'Input'; 

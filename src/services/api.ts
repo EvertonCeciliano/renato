@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:4000/api';
+const API_URL = 'http://localhost:4001/api';
 
 export const api = axios.create({
   baseURL: API_URL,
@@ -46,5 +46,6 @@ export const ordersApi = {
   getAll: () => api.get<Order[]>('/orders'),
   create: (data: { table_number: number; items: { id: number; quantity: number; price: number; }[] }) => 
     api.post('/orders', data),
-  updateStatus: (id: number, status: string) => api.put(`/orders/${id}`, { status }),
+  updateStatus: (id: number, status: string) => api.put(`/orders/${id}/status`, { status }),
+  delete: (id: number) => api.delete(`/orders/${id}`),
 };

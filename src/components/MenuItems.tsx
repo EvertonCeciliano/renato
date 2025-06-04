@@ -106,7 +106,9 @@ export default function MenuItems() {
       }
     } catch (error: any) {
       console.error('Error deleting menu item:', error);
-      if (error.response?.status === 400) {
+      if (error.response?.status === 409) {
+        setError(error.response.data.error);
+      } else if (error.response?.status === 400) {
         setError(error.response.data.error);
       } else if (error.response?.status === 404) {
         setError('Item não encontrado. Pode ter sido excluído.');

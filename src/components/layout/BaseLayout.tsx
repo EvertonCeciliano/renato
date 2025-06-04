@@ -1,54 +1,29 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { AppBar, Box, Container, Toolbar, Typography, Button } from '@mui/material';
 
-interface BaseLayoutProps {
-  children: React.ReactNode;
-}
-
-export function BaseLayout({ children }: BaseLayoutProps) {
+export function BaseLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
-
-  const isActive = (path: string) => {
-    return location.pathname === path;
-  };
+  const isActive = (path: string) => location.pathname === path;
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Restaurant Manager
-          </Typography>
-          <Button
-            color="inherit"
-            component={Link}
-            to="/"
-            sx={{ 
-              mx: 1,
-              fontWeight: isActive('/') ? 'bold' : 'normal',
-              borderBottom: isActive('/') ? 2 : 0
-            }}
-          >
-            Menu
-          </Button>
-          <Button
-            color="inherit"
-            component={Link}
-            to="/orders"
-            sx={{ 
-              mx: 1,
-              fontWeight: isActive('/orders') ? 'bold' : 'normal',
-              borderBottom: isActive('/orders') ? 2 : 0
-            }}
-          >
-            Orders
-          </Button>
-        </Toolbar>
-      </AppBar>
-      <Container component="main" sx={{ flex: 1, py: 3 }}>
+    <div className="min-h-screen flex flex-col bg-white">
+      {/* Navbar Apple Style */}
+      <nav className="sticky top-0 z-30 w-full bg-white/80 backdrop-blur border-b border-gray-100">
+        <div className="max-w-5xl mx-auto px-4 flex items-center justify-between h-16">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl font-bold text-gray-900 tracking-tight select-none">🍏</span>
+            <span className="text-lg font-semibold text-gray-800 select-none">Apple Manager</span>
+          </div>
+          <div className="flex items-center gap-6">
+            <Link to="/" className={`transition-colors font-medium px-2 py-1 rounded-full ${isActive('/') ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}>Menu</Link>
+            <Link to="/orders" className={`transition-colors font-medium px-2 py-1 rounded-full ${isActive('/orders') ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}>Orders</Link>
+          </div>
+        </div>
+      </nav>
+      {/* Main Content */}
+      <main className="flex-1 w-full max-w-5xl mx-auto px-4 py-10">
         {children}
-      </Container>
-    </Box>
+      </main>
+    </div>
   );
 }

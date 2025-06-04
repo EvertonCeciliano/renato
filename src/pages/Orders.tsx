@@ -122,9 +122,9 @@ export function Orders() {
   return (
     <Box>
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4">Orders</Typography>
+        <Typography variant="h4">Pedidos</Typography>
         <Button variant="contained" color="primary" onClick={handleOpen}>
-          New Order
+          Novo Pedido
         </Button>
       </Box>
 
@@ -134,22 +134,30 @@ export function Orders() {
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
-                  Table {order.table_number}
+                  Mesa {order.table_number}
                 </Typography>
                 <Chip
-                  label={order.status}
+                  label={(() => {
+                    switch (order.status.toLowerCase()) {
+                      case 'pending': return 'Pendente';
+                      case 'preparing': return 'Preparando';
+                      case 'ready': return 'Pronto';
+                      case 'delivered': return 'Entregue';
+                      default: return order.status;
+                    }
+                  })()}
                   color={getStatusColor(order.status)}
                   sx={{ mb: 2 }}
                 />
                 {order.items.map((item) => (
                   <Box key={item.id} sx={{ mb: 1 }}>
                     <Typography variant="body2">
-                      {item.quantity}x {item.name} - ${(Number(item.price) * item.quantity).toFixed(2)}
+                      {item.quantity}x {item.name} - R${(Number(item.price) * item.quantity).toFixed(2)}
                     </Typography>
                   </Box>
                 ))}
                 <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
-                  Total: ${Number(order.total_amount).toFixed(2)}
+                  Total: R${Number(order.total_amount).toFixed(2)}
                 </Typography>
                 <Box sx={{ mt: 2 }}>
                   <FormControl fullWidth size="small">
@@ -159,13 +167,30 @@ export function Orders() {
                       label="Status"
                       onChange={(e) => handleUpdateStatus(order.id, e.target.value)}
                     >
-                      <MenuItem value="pending">Pending</MenuItem>
-                      <MenuItem value="preparing">Preparing</MenuItem>
-                      <MenuItem value="ready">Ready</MenuItem>
-                      <MenuItem value="delivered">Delivered</MenuItem>
+                      <MenuItem value="pending">Pendente</MenuItem>
+                      <MenuItem value="preparing">Preparando</MenuItem>
+                      <MenuItem value="ready">Pronto</MenuItem>
+                      <MenuItem value="delivered">Entregue</MenuItem>
                     </Select>
                   </FormControl>
                 </Box>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  sx={{ mt: 2 }}
+                  onClick={async () => {
+                    if (window.confirm('Tem certeza que deseja excluir este pedido?')) {
+                      try {
+                        await ordersApi.delete(order.id);
+                        loadOrders();
+                      } catch (error) {
+                        console.error('Erro ao excluir pedido:', error);
+                      }
+                    }
+                  }}
+                >
+                  Excluir
+                </Button>
               </CardContent>
             </Card>
           </Grid>
@@ -173,12 +198,12 @@ export function Orders() {
       </Grid>
 
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-        <DialogTitle>New Order</DialogTitle>
+        <DialogTitle>Novo Pedido</DialogTitle>
         <form onSubmit={handleSubmit}>
           <DialogContent>
             <TextField
               fullWidth
-              label="Table Number"
+              label="Número da Mesa"
               type="number"
               value={tableNumber}
               onChange={(e) => setTableNumber(parseInt(e.target.value))}
@@ -187,7 +212,7 @@ export function Orders() {
               inputProps={{ min: 1 }}
             />
             <Typography variant="subtitle1" sx={{ mt: 2, mb: 1 }}>
-              Menu Items
+              Itens do Cardápio
             </Typography>
             <Grid container spacing={1}>
               {menuItems.map((menuItem) => (
@@ -199,14 +224,14 @@ export function Orders() {
                     sx={{ justifyContent: 'space-between' }}
                   >
                     <span>{menuItem.name}</span>
-                    <span>${Number(menuItem.price).toFixed(2)}</span>
+                    <span>R${Number(menuItem.price).toFixed(2)}</span>
                   </Button>
                 </Grid>
               ))}
             </Grid>
             {selectedItems.length > 0 && (
               <Box sx={{ mt: 2 }}>
-                <Typography variant="subtitle1">Selected Items:</Typography>
+                <Typography variant="subtitle1">Itens Selecionados:</Typography>
                 {selectedItems.map((item) => {
                   const menuItem = menuItems.find(m => m.id === item.id);
                   return (
@@ -227,25 +252,25 @@ export function Orders() {
                         color="error"
                         onClick={() => handleRemoveItem(item.id)}
                       >
-                        Remove
+                        Remover
                       </Button>
                     </Box>
                   );
                 })}
                 <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
-                  Total: ${selectedItems.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0).toFixed(2)}
+                  Total: R${selectedItems.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0).toFixed(2)}
                 </Typography>
               </Box>
             )}
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
+            <Button onClick={handleClose}>Cancelar</Button>
             <Button
               type="submit"
               variant="contained"
               disabled={loading || selectedItems.length === 0}
             >
-              {loading ? 'Creating...' : 'Create Order'}
+              {loading ? 'Criando...' : 'Criar Pedido'}
             </Button>
           </DialogActions>
         </form>
